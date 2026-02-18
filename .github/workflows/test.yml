@@ -10,6 +10,15 @@ on:
             domain:
                 description: "Infisical domain URL (e.g. your Pinggy tunnel URL)"
                 required: true
+            client-id:
+                description: "Universal Auth client ID"
+                required: true
+            client-secret:
+                description: "Universal Auth client secret"
+                required: true
+            identity-id:
+                description: "Machine Identity ID (for OIDC)"
+                required: true
 
 jobs:
     build:
@@ -41,8 +50,8 @@ jobs:
               uses: ./
               with:
                   method: universal-auth
-                  client-id: ${{ secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_ID }}
-                  client-secret: ${{ secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET }}
+                  client-id: ${{ inputs.client-id || secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_ID }}
+                  client-secret: ${{ inputs.client-secret || secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET }}
                   domain: ${{ inputs.domain }}
                   output-credential: "true"
                   output-env-credential: "true"
@@ -77,7 +86,7 @@ jobs:
               uses: ./
               with:
                   method: oidc
-                  identity-id: ${{ secrets.INFISICAL_MACHINE_IDENTITY_ID }}
+                  identity-id: ${{ inputs.identity-id || secrets.INFISICAL_MACHINE_IDENTITY_ID }}
                   domain: ${{ inputs.domain }}
                   output-credential: "true"
                   output-env-credential: "true"
