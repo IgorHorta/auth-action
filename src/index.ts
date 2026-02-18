@@ -68,10 +68,9 @@ const main = async () => {
     const method = core.getInput("method");
     const domain = core.getInput("domain");
     const exportType = core.getInput("export-type") as ExportType;
-    const fileOutputPath = core.getInput("file-output-path");
     const extraHeaders = parseHeadersInput("extra-headers");
 
-    validateExportType(exportType, fileOutputPath);
+    validateExportType(exportType);
     validateAuthMethod(method);
 
     let performAuth: TPerformAuth;
@@ -143,7 +142,7 @@ const main = async () => {
 
     const infisicalToken = await auth.login(performAuth);
 
-    await exportAccessToken(infisicalToken, exportType, fileOutputPath);
+    await exportAccessToken(infisicalToken, exportType);
   } catch (err) {
     core.setFailed((err as Error)?.message);
   }

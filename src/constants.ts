@@ -10,7 +10,7 @@ export enum AuthMethod {
 
 export enum ExportType {
   Env = "env",
-  File = "file",
+  Output = "output",
 }
 
 export const ENVIRONMENT_VARIABLE_NAMES = {

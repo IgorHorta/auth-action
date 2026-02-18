@@ -26,17 +26,16 @@ inputs:
     required: false
     default: "https://app.infisical.com"
   export-type:
-    description: "If set to `env`, it will set the obtained access token as an environment variable (INFISICAL_TOKEN). If set to `file`, it will export the access token to the specified file as defined in `file-output-path`"
+    description: "How to export the obtained access token. Use `output` to set it as a step output (access-token), or `env` to set it as an environment variable (INFISICAL_TOKEN). Defaults to `output`."
     required: true
-    default: "env"
-  file-output-path:
-    description: "The path to save the file when export-type is set to `file`"
-    required: false
-    default: "/.infisical-token"
+    default: "output"
   extra-headers:
     description: "Extra headers to add to all requests sent to Infisical"
     required: false
     default: ""
+outputs:
+  access-token:
+    description: "The obtained Infisical access token (only set when export-type is `output`)"
 runs:
   using: "node20"
   main: "dist/index.cjs"

@@ -27,20 +27,13 @@ export const handleRequestError = (err: unknown) => {
   }
 };
 
-export const validateExportType = (
-  exportType: string,
-  fileOutputPath: string,
-) => {
+export const validateExportType = (exportType: string) => {
   if (!exportType) {
     throw new Error("Export type is required");
   }
 
   if (!Object.values(ExportType).includes(exportType as ExportType)) {
     throw new Error(`Invalid export type: ${exportType}`);
-  }
-
-  if (exportType === ExportType.File && !fileOutputPath) {
-    throw new Error("file-output-path is required when export type is file");
   }
 };
 
@@ -53,24 +46,18 @@ export const validateAuthMethod = (authMethod: string) => {
 export const exportAccessToken = async (
   infisicalToken: string,
   exportType: ExportType,
-  fileOutputPath: string,
 ) => {
-  if (exportType === ExportType.Env) {
-    core.setSecret(infisicalToken);
-    core.exportVariable("INFISICAL_TOKEN", infisicalToken);
+  core.setSecret(infisicalToken);
 
+  if (exportType === ExportType.Env) {
+    core.exportVariable("INFISICAL_TOKEN", infisicalToken);
     core.info(
       "Injected Infisical token as environment variable [INFISICAL_TOKEN]",
     );
-  } else if (exportType === ExportType.File) {
-    try {
-      const filePath = `${process.env.GITHUB_WORKSPACE}${fileOutputPath}`;
-      core.info(`Exporting Infisical token to ${filePath}`);
-      await fs.writeFile(filePath, infisicalToken);
-    } catch (err) {
-      core.error(`Error writing file: ${(err as Error)?.message}`);
-      throw err;
-    }
-    core.info("Successfully exported Infisical token to file");
+  }
+
+  if (exportType === ExportType.Output) {
+    core.setOutput("access-token", infisicalToken);
+    core.info("Set Infisical token as action output [access-token]");
   }
 };
