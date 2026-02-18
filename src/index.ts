@@ -4,13 +4,8 @@ import {
   AuthMethod,
   ENVIRONMENT_VARIABLE_NAMES,
   EnvironmentVariableNames,
-  ExportType,
 } from "./constants";
-import {
-  exportAccessToken,
-  validateAuthMethod,
-  validateExportType,
-} from "./util";
+import { exportAccessToken, validateAuthMethod } from "./util";
 import { TPerformAuth } from "./types";
 
 function parseHeadersInput(inputKey: string) {
@@ -67,10 +62,10 @@ const main = async () => {
   try {
     const method = core.getInput("method");
     const domain = core.getInput("domain");
-    const exportType = core.getInput("export-type") as ExportType;
+    const outputCredential = core.getBooleanInput("output-credential");
+    const outputEnvCredential = core.getBooleanInput("output-env-credential");
     const extraHeaders = parseHeadersInput("extra-headers");
 
-    validateExportType(exportType);
     validateAuthMethod(method);
 
     let performAuth: TPerformAuth;
@@ -142,7 +137,7 @@ const main = async () => {
 
     const infisicalToken = await auth.login(performAuth);
 
-    await exportAccessToken(infisicalToken, exportType);
+    await exportAccessToken(infisicalToken, outputCredential, outputEnvCredential);
   } catch (err) {
     core.setFailed((err as Error)?.message);
   }

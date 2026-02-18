@@ -2,7 +2,7 @@ import axios from "axios";
 import core from "@actions/core";
 import fs from "fs/promises";
 import { AxiosError } from "axios";
-import { AuthMethod, ExportType } from "./constants";
+import { AuthMethod } from "./constants";
 
 export const createAxiosInstance = (
   domain: string,
@@ -27,16 +27,6 @@ export const handleRequestError = (err: unknown) => {
   }
 };
 
-export const validateExportType = (exportType: string) => {
-  if (!exportType) {
-    throw new Error("Export type is required");
-  }
-
-  if (!Object.values(ExportType).includes(exportType as ExportType)) {
-    throw new Error(`Invalid export type: ${exportType}`);
-  }
-};
-
 export const validateAuthMethod = (authMethod: string) => {
   if (!Object.values(AuthMethod).includes(authMethod as AuthMethod)) {
     throw new Error(`Invalid auth method: ${authMethod}`);
@@ -45,19 +35,20 @@ export const validateAuthMethod = (authMethod: string) => {
 
 export const exportAccessToken = async (
   infisicalToken: string,
-  exportType: ExportType,
+  outputCredential: boolean,
+  outputEnvCredential: boolean,
 ) => {
   core.setSecret(infisicalToken);
 
-  if (exportType === ExportType.Env) {
+  if (outputCredential) {
+    core.setOutput("access-token", infisicalToken);
+    core.info("Set Infisical token as action output [access-token]");
+  }
+
+  if (outputEnvCredential) {
     core.exportVariable("INFISICAL_TOKEN", infisicalToken);
     core.info(
       "Injected Infisical token as environment variable [INFISICAL_TOKEN]",
     );
-  }
-
-  if (exportType === ExportType.Output) {
-    core.setOutput("access-token", infisicalToken);
-    core.info("Set Infisical token as action output [access-token]");
   }
 };

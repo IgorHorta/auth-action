@@ -44,7 +44,7 @@ permissions:
 
 ## Usage
 
-With this action, you can export the obtained access token in two ways: as a step output or as an environment variable.
+By default, the obtained access token is set as a step output (`access-token`). You can also export it as an environment variable, or do both.
 
 ### As a step output (default)
 
@@ -65,7 +65,7 @@ The access token is set as a step output and can be referenced by subsequent wor
 
 ### As an environment variable
 
-The access token is set as the `INFISICAL_TOKEN` environment variable, accessible by all subsequent workflow steps.
+Set `output-env-credential` to `true` to export the access token as the `INFISICAL_TOKEN` environment variable, accessible by all subsequent workflow steps.
 
 ```yaml
 - name: Authenticate with Infisical
@@ -75,57 +75,35 @@ The access token is set as the `INFISICAL_TOKEN` environment variable, accessibl
     client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
     client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
     domain: "https://app.infisical.com"
-    export-type: "env"
+    output-env-credential: true
 
 - name: Use token
   run: echo "$INFISICAL_TOKEN"
 ```
 
-## Inputs
+## Options
 
-### `method`
+See [action.yml](./action.yaml) for more detail.
 
-**Required**. The authentication method to use. Possible values are `universal`, `oidc`, and `aws-iam`.
+<details>
+<summary>Options list and descriptions</summary>
 
-### `client-id`
+|          Option          |                                            Description                                            | Required | Default |
+|--------------------------|---------------------------------------------------------------------------------------------------|----------|---------|
+| method                   | The authentication method to use (`universal`, `oidc`, `aws-iam`).                                |   Yes    |         |
+| client-id                | Machine Identity client ID. Required if method is `universal`.                                    |    No    |         |
+| client-secret            | Machine Identity secret key. Required if method is `universal`.                                   |    No    |         |
+| identity-id              | Machine Identity ID. Required if method is `oidc` or `aws-iam`.                                  |    No    |         |
+| oidc-audience            | Custom aud claim for the signed Github ID token. Configurable if method is `oidc`.                |    No    |         |
+| domain                   | Infisical URL. If you're using Infisical EU (`https://eu.infisical.com`) or a self-hosted/dedicated instance, you will need to set the appropriate value for this field. | No | `https://app.infisical.com` |
+| output-credential        | When set to `true`, outputs the fetched access token as an action step output (`access-token`).   |    No    | `true`  |
+| output-env-credential    | When set to `true`, exports the fetched access token as an environment variable (`INFISICAL_TOKEN`). If you set this to `false`, you probably want to use `output-credential`. |    No    | `false` |
+| extra-headers            | Extra headers to add to all requests sent to Infisical. Useful if your Infisical instance is behind a header-based firewall. Newline-separated `Key: Value` pairs. |    No    |         |
 
-**Optional**. Machine Identity client ID. Required if method is `universal`.
-
-### `client-secret`
-
-**Optional**. Machine Identity secret key. Required if method is `universal`.
-
-### `identity-id`
-
-**Optional**. Machine Identity ID. Required if method is `oidc` or `aws-iam`.
-
-### `oidc-audience`
-
-**Optional**. Custom aud claim for the signed Github ID token. Configurable if method is `oidc`.
-
-### `domain`
-
-**Optional**. Infisical URL. Defaults to `https://app.infisical.com`. If you're using Infisical EU (`https://eu.infisical.com`) or a self-hosted/dedicated instance, you will need to set the appropriate value for this field.
-
-### `export-type`
-
-**Optional**. How to export the obtained access token. Use `output` to set it as a step output (`access-token`), or `env` to set it as an environment variable (`INFISICAL_TOKEN`). Defaults to `output`.
-
-### `extra-headers`
-
-**Optional**. Extra headers to add to all requests sent to Infisical. This is useful if your Infisical instance is behind a header-based firewall.
-
-Example:
-
-```yaml
-extra-headers: |
-    Example-Header: Header-Value
-    X-Request-Id: 1234567890
-    X-Authentication-Secret: ${{ secrets.AUTH_SECRET }}
-```
+</details>
 
 ## Outputs
 
-### `access-token`
-
-The obtained Infisical access token. Only set when `export-type` is `output`.
+|          Output          |                                            Description                                            |
+|--------------------------|---------------------------------------------------------------------------------------------------|
+| access-token             | The obtained Infisical access token. Only set when `output-credential` is `true`.                 |
